@@ -12,12 +12,13 @@
         .quiz-card { width: 100%; max-width: 450px; background: var(--card); border: 1px solid var(--border); border-radius: 24px; padding: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.6); text-align: center; }
         .fixed-header { font-size: 10px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
         .question-title { font-size: 24px; font-weight: 900; margin-bottom: 15px; line-height: 1.3; }
-        .btn-next { background: var(--primary); color: white; border: none; padding: 18px; border-radius: 12px; font-weight: 900; cursor: pointer; width: 100%; font-size: 16px; transition: all 0.3s; }
+        .video-container { position: relative; padding-top: 56.25%; background: #000; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border); width: 100%; }
+        .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 14px; font-weight: 900; cursor: pointer; width: 100%; font-size: 20px; text-transform: uppercase; transition: all 0.3s; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); }
         .btn-next:disabled { opacity: 0; pointer-events: none; transform: translateY(10px); }
+        #vsl-timer-msg { font-size: 14px; font-weight: 600; color: var(--muted); margin-top: 15px; display: block; }
         .screen { display: none; }
         .screen.active { display: block; }
-        .video-container { position: relative; padding-top: 56.25%; background: #000; border-radius: 12px; overflow: hidden; margin-bottom: 20px; border: 1px solid var(--border); }
-        /* ... (restante dos estilos do quiz, carrossel, etc - mantidos iguais) ... */
         .progress-bar { height: 4px; background: var(--border); border-radius: 10px; margin-bottom: 30px; overflow: hidden; }
         .progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s ease; }
         .options-grid { display: grid; gap: 12px; margin-bottom: 25px; }
@@ -38,25 +39,20 @@
 </head>
 <body>
     <div class="quiz-card">
-        <!-- Tela 1: Mini VSL com Delay -->
+        <!-- Tela 1: Mini VSL -->
         <div id="s-0" class="screen active">
             <div class="fixed-header">PROTOCOLO TRIPE - REVELADO</div>
             <h2 class="question-title">O SEGREDO QUE OS ATORES PORNÔ NÃO QUEREM QUE VOCÊ SAIBA.</h2>
-            
             <div class="video-container">
                 <iframe src="https://iframe.mediadelivery.net/embed/586375/98c5f14b-d940-49e6-9193-220447e78122?autoplay=true&loop=false&muted=false&preload=true&responsive=true" 
-                        loading="lazy" 
-                        style="border:0;position:absolute;top:0;height:100%;width:100%;" 
-                        allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" 
-                        allowfullscreen="true">
+                        loading="lazy" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture;" allowfullscreen="true">
                 </iframe>
             </div>
-
             <button id="vsl-button" class="btn-next" onclick="next( )" disabled>REVELAR O SEGREDO</button>
-            <p id="vsl-timer-msg" style="font-size: 10px; color: var(--muted); margin-top: 10px;">Assista ao vídeo para liberar o acesso...</p>
+            <span id="vsl-timer-msg">Assista ao vídeo para liberar o acesso...</span>
         </div>
 
-        <!-- ... (Restante das telas s-1, s-2, s-3, s-4 - mantidas iguais ao código anterior) ... -->
+        <!-- Tela 2: Modal de Autoridade -->
         <div id="s-1" class="screen">
             <div class="fixed-header">CONSULTA PROFISSIONAL GRATUITA</div>
             <h2 class="question-title">CLIQUE AGORA PARA FAZER SUA AVALIAÇÃO GRATUITA</h2>
@@ -70,12 +66,14 @@
             <button class="btn-next" onclick="next()" id="start-quiz-btn" disabled>INICIAR AVALIAÇÃO AGORA</button>
         </div>
 
+        <!-- Tela 3: Quiz Profissional (15 Perguntas) -->
         <div id="s-2" class="screen">
             <div class="fixed-header">AVALIAÇÃO CLÍNICA - ETAPA <span id="q-num">1</span>/15</div>
             <div class="progress-bar"><div class="progress-fill" id="p-fill"></div></div>
             <div id="q-box"></div>
         </div>
 
+        <!-- Tela 4: Processamento de Resultados -->
         <div id="s-3" class="screen">
             <div class="fixed-header">PROCESSANDO DIAGNÓSTICO</div>
             <h2 class="question-title">VALIDANDO SEU POTENCIAL DE CRESCIMENTO</h2>
@@ -90,6 +88,7 @@
             </div>
         </div>
 
+        <!-- Tela 5: Bloco de Oferta -->
         <div id="s-4" class="screen">
             <div class="fixed-header">DIAGNÓSTICO FINAL REVELADO</div>
             <h2 class="question-title">SEU POTENCIAL É DE <span class="text-red-500" id="final-result">+5.2cm</span> EM <span class="text-red-500" id="final-days">30</span> DIAS!</h2>
@@ -106,34 +105,100 @@
         import { getDatabase, ref, set, update, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
         // CONFIGURAÇÕES
-        const vslDurationSeconds = 90; // COLOQUE AQUI A DURAÇÃO DO SEU VÍDEO EM SEGUNDOS
-        const delayBeforeEnd = 2; // O botão aparece 2 segundos antes do fim
-        
+        const vslDurationSeconds = 90; // Duração do vídeo
+        const delayBeforeEnd = 2; // Botão aparece 2s antes do fim
+        const checkoutUrl = "https://pay.wiapy.com/w-SEU_PRODUTO"; 
         const firebaseConfig = { /* SUAS CONFIGS AQUI */ };
-        const checkoutUrl = "https://pay.wiapy.com/w-SEU_PRODUTO";
 
-        const QUESTIONS = [ /* ... 15 perguntas ... */ ];
+        const QUESTIONS = [
+            { id: 'idade', t: 'Qual sua faixa etária? (Fator de risco vascular )', o: ['18-25', '26-35', '36-45', '46-55', '55+'] },
+            { id: 'rigidez', t: 'Com que frequência você atinge rigidez máxima?', o: ['Quase nunca', 'Raramente', 'Às vezes', 'Frequentemente', 'Sempre'] },
+            { id: 'manutencao', t: 'Consegue manter a ereção até o final do ato?', o: ['Tenho muita dificuldade', 'Às vezes falha', 'Sim, sem problemas'] },
+            { id: 'matinal', t: 'Você acorda com ereção matinal?', o: ['Nunca', 'Raramente', 'Quase todos os dias'] },
+            { id: 'circulacao', t: 'Sente as extremidades (mãos/pés) frias com frequência?', o: ['Sim, constantemente', 'Às vezes', 'Não'] },
+            { id: 'historico', t: 'Você tem histórico de Diabetes ou Pressão Alta?', o: ['Sim, ambos', 'Sim, um deles', 'Não'] },
+            { id: 'tamanho', t: 'Você percebeu alguma redução no tamanho ao longo dos anos?', o: ['Sim, visível', 'Talvez um pouco', 'Não'] },
+            { id: 'estresse', t: 'Qual seu nível de estresse diário?', o: ['Muito alto', 'Alto', 'Moderado', 'Baixo'] },
+            { id: 'sono', t: 'Quantas horas de sono de qualidade você tem?', o: ['Menos de 5h', '5-6h', '7-8h', 'Mais de 8h'] },
+            { id: 'libido', t: 'Como você avalia seu desejo sexual (libido)?', o: ['Muito baixo', 'Baixo', 'Normal', 'Alto'] },
+            { id: 'vicios', t: 'Você fuma ou consome álcool em excesso?', o: ['Sim, ambos', 'Sim, um deles', 'Não'] },
+            { id: 'medicamentos', t: 'Faz uso contínuo de algum medicamento?', o: ['Sim', 'Não'] },
+            { id: 'exercicio', t: 'Qual sua frequência de exercícios físicos?', o: ['Nunca', '1-2x/semana', '3-4x/semana', 'Diariamente'] },
+            { id: 'recuperacao', t: 'Quanto tempo leva para ter uma segunda ereção?', o: ['Mais de 1 hora', '30 minutos', '10-20 minutos', 'Quase imediato'] },
+            { id: 'prioridade', t: 'Resolver este problema é sua prioridade máxima?', o: ['Sim, urgente', 'Sim, mas posso esperar', 'Apenas curiosidade'] }
+        ];
 
-        const app = initializeApp(firebaseConfig );
+        const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const sid = 's_' + Date.now();
 
-        // LÓGICA DO DELAY DO BOTÃO VSL
+        let step = 0, qIdx = 0, stepStartTime = 0, avgHesitation = 0, hesitationCount = 0;
+
+        // DELAY DO BOTÃO VSL
         setTimeout(() => {
-            const btn = document.getElementById('vsl-button');
-            const msg = document.getElementById('vsl-timer-msg');
-            btn.disabled = false;
-            msg.style.display = 'none';
-            // Notifica o Firebase que o botão apareceu (Métrica de Retenção)
+            document.getElementById('vsl-button').disabled = false;
+            document.getElementById('vsl-timer-msg').style.display = 'none';
             update(ref(db, 'sessions/'+sid), { vsl_button_appeared: true });
         }, (vslDurationSeconds - delayBeforeEnd) * 1000);
 
-        // ... (Restante da lógica de navegação, quiz e carrossel - mantida igual) ...
-        window.next = () => { /* ... */ };
-        window.sel = (id, val) => { /* ... */ };
-        window.finish = () => { /* ... */ };
-        function render() { /* ... */ };
-        function init() { render(); set(ref(db, 'sessions/'+sid), { enteredAt: serverTimestamp(), status: 'vsl_viewed' }); }
+        window.next = () => {
+            if (step === 0) { step = 1; update(ref(db, 'sessions/'+sid), { status: 'modal_clicked' }); startModalDelay(); }
+            else if (step === 1) { step = 2; update(ref(db, 'sessions/'+sid), { status: 'quiz_started' }); }
+            else if (step === 2) { if (qIdx < 14) { qIdx++; } else { step = 3; startProcessing(); } }
+            render();
+        };
+
+        window.sel = (id, val) => {
+            const hesitation = Date.now() - stepStartTime;
+            avgHesitation = (avgHesitation * hesitationCount + hesitation) / (hesitationCount + 1);
+            hesitationCount++;
+            update(ref(db, 'sessions/'+sid), { [id]: val, currentStep: qIdx + 1, avgHesitation: avgHesitation });
+            window.next();
+        };
+
+        window.finish = () => { 
+            update(ref(db, 'sessions/'+sid), { status: 'checkout_clicked' }); 
+            window.location.href = `${checkoutUrl}?utm_source=${sid}&external_id=${sid}`; 
+        };
+
+        function render() {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById('s-' + step).classList.add('active');
+            if (step === 2) {
+                const q = QUESTIONS[qIdx];
+                document.getElementById('q-num').textContent = qIdx + 1;
+                document.getElementById('p-fill').style.width = ((qIdx+1)/15*100) + '%';
+                document.getElementById('q-box').innerHTML = `<div class="question-title">${q.t}</div><div class="options-grid">${q.o.map((o, i) => `<button class="option-btn" onclick="sel('${q.id}', ${i})">${o}</button>`).join('')}</div>`;
+                stepStartTime = Date.now();
+            }
+        }
+
+        function startModalDelay() {
+            let sIdx = 0; const slides = document.querySelectorAll('#authority-carousel .slide');
+            const interval = setInterval(() => { slides.forEach(s => s.classList.remove('active')); sIdx = (sIdx + 1) % slides.length; slides[sIdx].classList.add('active'); }, 2000);
+            setTimeout(() => { clearInterval(interval); document.getElementById('loading-text').textContent = "Avaliação carregada!"; document.getElementById('start-quiz-btn').disabled = false; }, 5000);
+        }
+
+        function startProcessing() {
+            let sIdx = 0; const slides = document.querySelectorAll('#depo-carousel .slide');
+            const interval = setInterval(() => { slides.forEach(s => s.classList.remove('active')); sIdx = (sIdx + 1) % slides.length; slides[sIdx].classList.add('active'); }, 2000);
+            setTimeout(() => { document.getElementById('b1').className = 'bullet-icon green'; document.getElementById('t1').textContent = "POTENCIAL VALIDADO!"; }, 2000);
+            setTimeout(() => { document.getElementById('b2').className = 'bullet-icon green'; document.getElementById('t2').textContent = "COMPATIBILIDADE CONFIRMADA!"; }, 4000);
+            setTimeout(() => { document.getElementById('b3').className = 'bullet-icon green'; document.getElementById('t3').textContent = "PROTOCOLO COMPATÍVEL!"; }, 6000);
+            setTimeout(() => { clearInterval(interval); step = 4; startCountdown(); render(); }, 8000);
+        }
+
+        function startCountdown() {
+            let time = 600;
+            const interval = setInterval(() => {
+                const m = String(Math.floor(time / 60)).padStart(2, '0');
+                const s = String(time % 60).padStart(2, '0');
+                document.getElementById('countdown').textContent = `${m}:${s}`;
+                if (time-- < 0) clearInterval(interval);
+            }, 1000);
+        }
+
+        function init() { render(); set(ref(db, 'sessions/'+sid), { enteredAt: serverTimestamp(), status: 'vsl_viewed', currentStep: 0 }); }
         init();
     </script>
 </body>
