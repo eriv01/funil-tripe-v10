@@ -39,7 +39,6 @@
 </head>
 <body>
     <div class="quiz-card">
-        <!-- Tela 1: Mini VSL -->
         <div id="s-0" class="screen active">
             <div class="fixed-header">PROTOCOLO TRIPE - REVELADO</div>
             <h2 class="question-title">O SEGREDO QUE OS ATORES PORNÔ NÃO QUEREM QUE VOCÊ SAIBA.</h2>
@@ -52,7 +51,6 @@
             <span id="vsl-timer-msg">Assista ao vídeo para liberar o acesso...</span>
         </div>
 
-        <!-- Tela 2: Modal de Autoridade -->
         <div id="s-1" class="screen">
             <div class="fixed-header">CONSULTA PROFISSIONAL GRATUITA</div>
             <h2 class="question-title">CLIQUE AGORA PARA FAZER SUA AVALIAÇÃO GRATUITA</h2>
@@ -66,14 +64,12 @@
             <button class="btn-next" onclick="next()" id="start-quiz-btn" disabled>INICIAR AVALIAÇÃO AGORA</button>
         </div>
 
-        <!-- Tela 3: Quiz Profissional (15 Perguntas) -->
         <div id="s-2" class="screen">
             <div class="fixed-header">AVALIAÇÃO CLÍNICA - ETAPA <span id="q-num">1</span>/15</div>
             <div class="progress-bar"><div class="progress-fill" id="p-fill"></div></div>
             <div id="q-box"></div>
         </div>
 
-        <!-- Tela 4: Processamento de Resultados -->
         <div id="s-3" class="screen">
             <div class="fixed-header">PROCESSANDO DIAGNÓSTICO</div>
             <h2 class="question-title">VALIDANDO SEU POTENCIAL DE CRESCIMENTO</h2>
@@ -88,7 +84,6 @@
             </div>
         </div>
 
-        <!-- Tela 5: Bloco de Oferta -->
         <div id="s-4" class="screen">
             <div class="fixed-header">DIAGNÓSTICO FINAL REVELADO</div>
             <h2 class="question-title">SEU POTENCIAL É DE <span class="text-red-500" id="final-result">+5.2cm</span> EM <span class="text-red-500" id="final-days">30</span> DIAS!</h2>
@@ -104,33 +99,15 @@
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
         import { getDatabase, ref, set, update, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js';
 
-     // CONFIGURAÇÕES
-const delaySeconds = 293; // 4 minutos e 53 segundos (4*60 + 53)
-const checkoutUrl = "https://pay.wiapy.com/w-SEU_PRODUTO"; 
-const firebaseConfig = {const firebaseConfig = {
-    apiKey: "AIzaSy... (Pegue esta chave no Console do Firebase > Configurações do Projeto)", 
-    authDomain: "funil-tripe-v10.firebaseapp.com",
-    databaseURL: "https://funil-tripe-v10-default-rtdb.firebaseio.com",
-    projectId: "funil-tripe-v10",
-    storageBucket: "funil-tripe-v10.appspot.com",
-    messagingSenderId: "1025556244610",
-    appId: "1:1025556244610:web: (Pegue o AppID no Console do Firebase )"
-};
- };
-
-// ... (restante do código ) ...
-
-// LÓGICA DO DELAY FIXO DO BOTÃO VSL
-setTimeout(() => {
-    const btn = document.getElementById('vsl-button');
-    const msg = document.getElementById('vsl-timer-msg');
-    if(btn) btn.disabled = false;
-    if(msg) msg.style.display = 'none';
-    
-    // Notifica o Firebase que o lead chegou ao tempo do botão
-    update(ref(db, 'sessions/'+sid), { vsl_button_appeared: true });
-}, delaySeconds * 1000);
-
+        const firebaseConfig = {
+            apiKey: "AIzaSyCrUYYLb_9p4QUq1JLqQUwWEx-GgWEoTxQ",
+            authDomain: "funil-tripe-v10.firebaseapp.com",
+            databaseURL: "https://funil-tripe-v10-default-rtdb.firebaseio.com",
+            projectId: "funil-tripe-v10",
+            storageBucket: "funil-tripe-v10.firebasestorage.app",
+            messagingSenderId: "872809369468",
+            appId: "1:872809369468:web:e372a48b9654739098def9"
+        };
 
         const QUESTIONS = [
             { id: 'idade', t: 'Qual sua faixa etária? (Fator de risco vascular )', o: ['18-25', '26-35', '36-45', '46-55', '55+'] },
@@ -153,15 +130,13 @@ setTimeout(() => {
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const sid = 's_' + Date.now();
-
         let step = 0, qIdx = 0, stepStartTime = 0, avgHesitation = 0, hesitationCount = 0;
 
-        // DELAY DO BOTÃO VSL
         setTimeout(() => {
             document.getElementById('vsl-button').disabled = false;
             document.getElementById('vsl-timer-msg').style.display = 'none';
             update(ref(db, 'sessions/'+sid), { vsl_button_appeared: true });
-        }, (vslDurationSeconds - delayBeforeEnd) * 1000);
+        }, 293000); // 4:53 fixo
 
         window.next = () => {
             if (step === 0) { step = 1; update(ref(db, 'sessions/'+sid), { status: 'modal_clicked' }); startModalDelay(); }
@@ -180,10 +155,10 @@ setTimeout(() => {
 
         window.finish = () => { 
             update(ref(db, 'sessions/'+sid), { status: 'checkout_clicked' }); 
-            window.location.href = `${checkoutUrl}?utm_source=${sid}&external_id=${sid}`; 
+            window.location.href = `https://pay.wiapy.com/w-SEU_PRODUTO?utm_source=${sid}&external_id=${sid}`; 
         };
 
-        function render() {
+        function render( ) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById('s-' + step).classList.add('active');
             if (step === 2) {
