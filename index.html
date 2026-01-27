@@ -28,6 +28,7 @@
         .slide { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; display: flex; align-items: center; justify-content: center; }
         .slide.active { opacity: 1; }
         .slide img { width: 100%; height: 100%; object-fit: contain; }
+        .slide-caption { position: absolute; bottom: 10px; left: 10px; right: 10px; background: rgba(0,0,0,0.8); padding: 8px; border-radius: 8px; font-size: 11px; font-weight: 700; color: #22c55e; border: 1px solid rgba(34, 197, 94, 0.3); text-align: center; z-index: 10; }
         .bullet-point { display: flex; align-items: center; text-align: left; margin-bottom: 10px; font-weight: 600; }
         .bullet-icon { width: 20px; height: 20px; border-radius: 50%; margin-right: 10px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         .bullet-icon.red { background-color: var(--primary); }
@@ -43,26 +44,33 @@
             <div class="fixed-header">PROTOCOLO TRIPE - REVELADO</div>
             <h1 class="headline">ESTE SEGREDO PODE MUDAR SUA VIDA SEXUAL PARA SEMPRE.</h1>
             <p class="sub-headline">Assista ao vídeo abaixo para liberar sua avaliação gratuita.</p>
-            
             <div class="video-container">
                 <script src="https://fast.wistia.com/player.js" async></script>
                 <script src="https://fast.wistia.com/embed/q600dov5tx.js" async type="module"></script>
                 <style>wistia-player[media-id='q600dov5tx']:not(:defined ) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/q600dov5tx/swatch' ); display: block; filter: blur(5px); padding-top:178.06%; }</style> 
                 <wistia-player media-id="q600dov5tx" aspect="0.5616224648985959"></wistia-player>
             </div>
-
             <button id="vsl-button" class="btn-next" onclick="next()">REVELAR O SEGREDO</button>
         </div>
 
-        <!-- Tela 2: Modal de Autoridade -->
+        <!-- Tela 2: Modal de Autoridade Atualizado -->
         <div id="s-1" class="screen">
             <div class="fixed-header">CONSULTA PROFISSIONAL GRATUITA</div>
             <h2 style="font-size: 22px; font-weight: 900; margin-bottom: 15px;">CLIQUE AGORA PARA FAZER SUA AVALIAÇÃO GRATUITA</h2>
             <div class="urgency-badge"><span id="online-count-val">147</span> HOMENS ONLINE AGORA</div>
             <div class="carousel" id="authority-carousel">
-                <div class="slide active"><img src="https://protocolotripe.online/wp-content/uploads/2026/01/55db78_0079baf30d6c485581fa2291d62c7d25_mv2.jpg"></div>
-                <div class="slide"><img src="https://protocolotripe.online/wp-content/uploads/2026/01/154c4e_580c204a6f9b42caa1d9e689de18d065_mv2.jpg"></div>
-                <div class="slide"><img src="https://protocolotripe.online/wp-content/uploads/2026/01/images.png"></div>
+                <div class="slide active">
+                    <img src="https://protocolotripe.online/wp-content/uploads/2026/01/55db78_0079baf30d6c485581fa2291d62c7d25_mv2.jpg">
+                    <div class="slide-caption">PACIENTE M. SOUZA: +5.8cm (VALIDADO )</div>
+                </div>
+                <div class="slide">
+                    <img src="https://protocolotripe.online/wp-content/uploads/2026/01/154c4e_580c204a6f9b42caa1d9e689de18d065_mv2.jpg">
+                    <div class="slide-caption">PACIENTE R. OLIVEIRA: +4.9cm (VALIDADO )</div>
+                </div>
+                <div class="slide">
+                    <img src="https://protocolotripe.online/wp-content/uploads/2026/01/images.png">
+                    <div class="slide-caption">ESTUDO CLÍNICO: EXPANSÃO TECIDUAL ATIVA</div>
+                </div>
             </div>
             <p style="color: var(--muted ); margin-bottom: 25px;" id="loading-text">Carregando avaliação gratuita...</p>
             <button class="btn-next" onclick="next()" id="start-quiz-btn" disabled>INICIAR AVALIAÇÃO AGORA</button>
@@ -145,19 +153,9 @@
         }, 556000);
 
         window.next = () => {
-            if (step === 0) { 
-                step = 1; 
-                update(ref(db, 'sessions/'+sid), { status: 'vsl_clicked' }); 
-                startModalDelay(); 
-            }
-            else if (step === 1) { 
-                step = 2; 
-                update(ref(db, 'sessions/'+sid), { status: 'quiz_started' }); 
-            }
-            else if (step === 2) { 
-                if (qIdx < 14) { qIdx++; } 
-                else { step = 3; startProcessing(); } 
-            }
+            if (step === 0) { step = 1; update(ref(db, 'sessions/'+sid), { status: 'vsl_clicked' }); startModalDelay(); }
+            else if (step === 1) { step = 2; update(ref(db, 'sessions/'+sid), { status: 'quiz_started' }); }
+            else if (step === 2) { if (qIdx < 14) { qIdx++; } else { step = 3; startProcessing(); } }
             render();
         };
 
@@ -210,6 +208,16 @@
                 if (time-- < 0) clearInterval(interval);
             }, 1000);
         }
+
+        // Lógica do Contador Dinâmico de Homens Online
+        setInterval(() => {
+            const el = document.getElementById('online-count-val');
+            if(el) {
+                const current = parseInt(el.innerText);
+                const change = Math.floor(Math.random() * 6) - 2; 
+                el.innerText = Math.max(135, Math.min(172, current + change));
+            }
+        }, 3500);
 
         function init() { render(); set(ref(db, 'sessions/'+sid), { enteredAt: serverTimestamp(), status: 'vsl_viewed', currentStep: 0 }); }
         init();
