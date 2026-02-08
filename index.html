@@ -15,7 +15,10 @@
         .sub-headline { font-size: 14px; color: var(--primary); font-weight: 700; margin-bottom: 20px; }
         .video-container { position: relative; background: #000; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border); width: 100%; display: flex; align-items: center; justify-content: center; min-height: 267px; }
         .video-container wistia-player { margin: 0 auto; }
-        .btn-next { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 14px; font-weight: 900; cursor: pointer; width: 100%; font-size: 20px; text-transform: uppercase; transition: all 0.3s; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); }
+        .video-container.sticky { position: fixed; top: 0; left: 0; right: 0; z-index: 9999; margin: 0; border-radius: 0; max-width: 100%; }
+        .video-placeholder { height: 267px; display: none; }
+        .video-placeholder.show { display: block; }
+        .btn-next { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 14px; font-weight: 900; cursor: pointer; width: 100%; font-size: 20px; text-transform: uppercase; transition: all 0.3s; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); position: sticky; bottom: 0; z-index: 999; }
         .btn-next:hover { transform: scale(1.02); }
         .screen { display: none; }
         .screen.active { display: block; }
@@ -52,7 +55,8 @@
             <div class="fixed-header">PROTOCOLO TRIPE - REVELADO</div>
             <h1 class="headline">O SEGREDO DOS ATORES PÔRNO PARA ATIVAR O CRESCIMENTO DO PÊNIS EM 45 DIAS.</h1>
             <p class="sub-headline">Assista ao vídeo abaixo para liberar sua 👇avaliação gratuita👇</p>
-            <div class="video-container">
+            <div class="video-placeholder"></div>
+            <div class="video-container" id="video-container">
               <script src="https://fast.wistia.com/player.js" async></script>
               <script src="https://fast.wistia.com/embed/kf6oec0viz.js" async type="module"></script>
               <wistia-player media-id="kf6oec0viz" wistia-popover="true" aspect="0.5616224648985959" style="width: 150px;height: 267px;"></wistia-player>  
@@ -262,6 +266,25 @@
 
         function init() { render(); set(ref(db, 'sessions/'+sid), { enteredAt: serverTimestamp(), status: 'vsl_viewed', currentStep: 0 }); }
         init();
+
+        // Controle de vídeo fixo e scroll
+        let videoFixed = false;
+        window.addEventListener('scroll', () => {
+            if (step !== 0) return;
+            const videoContainer = document.getElementById('video-container');
+            const placeholder = document.querySelector('.video-placeholder');
+            const rect = videoContainer.getBoundingClientRect();
+            
+            if (rect.top <= 0 && !videoFixed) {
+                videoFixed = true;
+                videoContainer.classList.add('sticky');
+                placeholder.classList.add('show');
+            } else if (window.scrollY === 0 && videoFixed) {
+                videoFixed = false;
+                videoContainer.classList.remove('sticky');
+                placeholder.classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
