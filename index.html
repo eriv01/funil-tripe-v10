@@ -13,7 +13,8 @@
         .fixed-header { font-size: 10px; font-weight: 900; color: var(--primary); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
         .headline { font-size: 22px; font-weight: 900; color: #fff; margin-bottom: 15px; line-height: 1.2; text-transform: uppercase; }
         .sub-headline { font-size: 14px; color: var(--primary); font-weight: 700; margin-bottom: 20px; }
-        .video-container { position: relative; background: #000; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border); width: 100%; }
+        .video-container { position: relative; background: #000; border-radius: 16px; overflow: hidden; margin-bottom: 25px; border: 1px solid var(--border); width: 100%; display: flex; align-items: center; justify-content: center; min-height: 267px; }
+        .video-container wistia-player { margin: 0 auto; }
         .btn-next { background: var(--primary); color: white; border: none; padding: 22px; border-radius: 14px; font-weight: 900; cursor: pointer; width: 100%; font-size: 20px; text-transform: uppercase; transition: all 0.3s; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); }
         .btn-next:hover { transform: scale(1.02); }
         .screen { display: none; }
@@ -52,7 +53,9 @@
             <h1 class="headline">O SEGREDO DOS ATORES PÔRNO PARA ATIVAR O CRESCIMENTO DO PÊNIS EM 45 DIAS.</h1>
             <p class="sub-headline">Assista ao vídeo abaixo para liberar sua 👇avaliação gratuita👇</p>
             <div class="video-container">
-              <script src="https://fast.wistia.com/player.js" async></script><script src="https://fast.wistia.com/embed/kf6oec0viz.js" async type="module"></script><style>wistia-player[media-id='kf6oec0viz'=]:not(:defined) { background: center / contain no-repeat url('https://fast.wistia.com/embed/medias/kf6oec0viz/swatch'); display: block; filter: blur(5px); }</style> <wistia-player media-id="kf6oec0viz" wistia-popover="true" aspect="0.5616224648985959" style="width: 150px;height: 267px;"></wistia-player>  
+              <script src="https://fast.wistia.com/player.js" async></script>
+              <script src="https://fast.wistia.com/embed/kf6oec0viz.js" async type="module"></script>
+              <wistia-player media-id="kf6oec0viz" wistia-popover="true" aspect="0.5616224648985959" style="width: 150px;height: 267px;"></wistia-player>  
             </div>
             <button id="vsl-button" class="btn-next" onclick="next()">REVELAR O SEGREDO</button>
         </div>
