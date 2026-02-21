@@ -122,16 +122,24 @@
             </div>
             <div id="analysis-box" style="margin-top: 25px;">
                 <div class="analysis-item">
-                    <div class="analysis-label"><span>FLUXO SANGUÍNEO CAVERNOSO</span> <span id="st-1" class="status-tag">PROCESSANDO</span></div>
+                    <div class="analysis-label"><span>CAPACIDADE DE EXPANSÃO TECIDUAL</span> <span id="st-1" class="status-tag">PROCESSANDO</span></div>
                     <div class="progress-container"><div id="pb-1" class="progress-bar-fill"></div></div>
                 </div>
                 <div class="analysis-item">
-                    <div class="analysis-label"><span>DENSIDADE TECIDUAL</span> <span id="st-2" class="status-tag">AGUARDANDO</span></div>
+                    <div class="analysis-label"><span>POTENCIAL DE CRESCIMENTO NATURAL</span> <span id="st-2" class="status-tag">AGUARDANDO</span></div>
                     <div class="progress-container"><div id="pb-2" class="progress-bar-fill"></div></div>
                 </div>
                 <div class="analysis-item">
-                    <div class="analysis-label"><span>COMPATIBILIDADE PROTOCOLO</span> <span id="st-3" class="status-tag">AGUARDANDO</span></div>
+                    <div class="analysis-label"><span>ÍNDICE DE VASCULARIZAÇÃO PENIANA</span> <span id="st-3" class="status-tag">AGUARDANDO</span></div>
                     <div class="progress-container"><div id="pb-3" class="progress-bar-fill"></div></div>
+                </div>
+                <div class="analysis-item">
+                    <div class="analysis-label"><span>RESPOSTA HORMONAL AO PROTOCOLO</span> <span id="st-4" class="status-tag">AGUARDANDO</span></div>
+                    <div class="progress-container"><div id="pb-4" class="progress-bar-fill"></div></div>
+                </div>
+                <div class="analysis-item">
+                    <div class="analysis-label"><span>TAXA DE SUCESSO DO PROTOCOLO</span> <span id="st-5" class="status-tag">AGUARDANDO</span></div>
+                    <div class="progress-container"><div id="pb-5" class="progress-bar-fill"></div></div>
                 </div>
             </div>
         </div>
@@ -142,27 +150,25 @@
             <h2 style="font-size: 22px; font-weight: 900; margin-bottom: 10px;">SEU PLANO PERSONALIZADO ESTÁ PRONTO!</h2>
             
             <div class="benefit-list">
-                <div class="benefit-item"><span>✓</span> Aumente até 7cm de comprimento e 3cm de grossura de forma 100% natural e permanente</div>
-                <div class="benefit-item"><span>✓</span> Ereções de aço que duram 3x mais tempo - acabou aquela "brochada" constrangedora</div>
-                <div class="benefit-item"><span>✓</span> Primeiros resultados VISÍVEIS em apenas 45 dias ou seu dinheiro de volta</div>
-                <div class="benefit-item"><span>✓</span> Zero aparelhos constrangedores, bombas dolorosas ou remédios com efeitos colaterais</div>
-                <div class="benefit-item"><span>✓</span> Faça ela IMPLORAR por mais - domine completamente na cama e veja ela gozar múltiplas vezes</div>
-                <div class="benefit-item"><span>✓</span> Controle total da ejaculação - dure quanto VOCÊ quiser, 1, 2 ou até 3 horas seguidas</div>
-                <div class="benefit-item"><span>✓</span> Recuperação ultra-rápida entre uma transa e outra - pronto pro round 2 em minutos</div>
-                <div class="benefit-item"><span>✓</span> Confiança INABALÁVEL - nunca mais se sinta inseguro ou envergonhado na hora H</div>
+                <div class="benefit-item"><span>✓</span> AUMENTE O TAMANHO E GROSSURA NATURALMENTE</div>
+                <div class="benefit-item"><span>✓</span> EREÇÕES MAIS DURADOURAS</div>
+                <div class="benefit-item"><span>✓</span> PRIMEIROS RESULTADOS EM 45 DIAS</div>
+                <div class="benefit-item"><span>✓</span> SEM APARELHOS OU REMEDIOS</div>
+                <div class="benefit-item"><span>✓</span> FAÇA ELA GOZAR 3 VEZES POR NOITE</div>
+                <div class="benefit-item"><span>✓</span> DURE ATE 3 HORAS NA CAMA</div>
             </div>
 
             <div class="guarantee-box">
-                <img src="https://doram.shop/wp-content/uploads/2026/02/ChatGPT-Image-19-de-fev.-de-2026-11_38_11-1.png" class="guarantee-badge">
+                <img src="https://metodotripe.shop/wp-content/uploads/2026/02/7564b4c41b95c4d46ca0_-_94d8bd698ca2c759ce37_-_inserir-um-titulo.jpg" class="guarantee-badge">
                 <div class="guarantee-text">
                     <p style="font-weight: 900; color: #fff;">MÉTODO TRIPE</p>
-                    <p style="font-weight: 900; color: #22c55e;">GARANTIA INCONDICIONAL DE 30 DIAS</p>
-                    <p style="color: var(--muted);">+ R$1.497 em BÔNUS EXCLUSIVOS</p>
+                    <p style="font-weight: 900; color: #22c55e;">30 DIAS DE GARANTIA</p>
+                    <p style="color: var(--muted);">+ BÔNUS EXCLUSIVOS INCLUSOS</p>
                 </div>
             </div>
 
             <button class="btn-next" onclick="finish()" style="margin-top: 10px;">GARANTIR MEU ACESSO AGORA</button>
-            <p style="font-size: 10px; color: var(--muted); margin-top: 15px;">✓ Compra 100% Segura e Sigilosa • Dados Protegidos com Criptografia SSL</p>
+            <p style="font-size: 10px; color: var(--muted); margin-top: 15px;">Compra 100% Segura e Sigilosa</p>
         </div>
     </div>
 
@@ -262,7 +268,7 @@
                 document.getElementById('st-1').textContent = 'VALIDADO ✓';
                 document.getElementById('st-1').classList.add('complete');
                 document.getElementById('st-2').textContent = 'PROCESSANDO';
-            }, 2500);
+            }, 2000);
 
             setTimeout(function() {
                 document.getElementById('pb-2').style.width = '100%';
@@ -270,20 +276,36 @@
                 document.getElementById('st-2').textContent = 'VALIDADO ✓';
                 document.getElementById('st-2').classList.add('complete');
                 document.getElementById('st-3').textContent = 'PROCESSANDO';
-            }, 5000);
+            }, 4000);
 
             setTimeout(function() {
                 document.getElementById('pb-3').style.width = '100%';
                 document.getElementById('pb-3').classList.add('complete');
-                document.getElementById('st-3').textContent = 'COMPATÍVEL ✓';
+                document.getElementById('st-3').textContent = 'VALIDADO ✓';
                 document.getElementById('st-3').classList.add('complete');
-            }, 7500);
+                document.getElementById('st-4').textContent = 'PROCESSANDO';
+            }, 6000);
+
+            setTimeout(function() {
+                document.getElementById('pb-4').style.width = '100%';
+                document.getElementById('pb-4').classList.add('complete');
+                document.getElementById('st-4').textContent = 'VALIDADO ✓';
+                document.getElementById('st-4').classList.add('complete');
+                document.getElementById('st-5').textContent = 'PROCESSANDO';
+            }, 8000);
+
+            setTimeout(function() {
+                document.getElementById('pb-5').style.width = '100%';
+                document.getElementById('pb-5').classList.add('complete');
+                document.getElementById('st-5').textContent = 'COMPATÍVEL ✓';
+                document.getElementById('st-5').classList.add('complete');
+            }, 10000);
 
             setTimeout(function() {
                 clearInterval(interval);
                 step = 4;
                 render();
-            }, 9000);
+            }, 12000);
         }
 
         setInterval(function() {
