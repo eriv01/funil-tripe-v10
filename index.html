@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#050505">
     <title>Consulta Profissional - Protocolo BICARBONATO</title>
 
-    <!-- META PIXEL -->
     <script>
     !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
     fbq('init','1608381797077092');fbq('track','PageView');
@@ -70,20 +69,193 @@
         .social-proof-live{font-size:clamp(11px,3vw,13px);color:var(--green);font-weight:700;margin:14px 0}
         .question-text{font-size:clamp(17px,4.8vw,22px);font-weight:900;margin-bottom:18px;line-height:1.35;text-align:left}
 
-        /* VIDEO AUTOPLAY */
-        .video-wrap{position:relative;width:100%;background:#000;border-radius:14px;overflow:hidden;margin-bottom:16px;border:1px solid var(--border);aspect-ratio:9/16}
-        .video-wrap video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
-        
-        /* BARRA PROGRESSO VTURB STYLE */
-        .video-progress-bar{position:absolute;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,0.15);z-index:100}
-        .video-progress-fill{height:100%;width:0%;background:linear-gradient(90deg, #ef4444 0%, #dc2626 50%, #b91c1c 100%);box-shadow:0 0 8px rgba(239,68,68,0.6);transition:width 0.1s linear;position:relative}
-        .video-progress-fill::after{content:'';position:absolute;top:0;right:0;width:30px;height:100%;background:linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);animation:shimmer 1.5s infinite}
-        @keyframes shimmer{0%{transform:translateX(-100%)}100%{transform:translateX(100%)}}
-        
-        .video-loading{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#000;z-index:20;gap:12px}
-        .video-loading.hidden{display:none}
-        .vl-spinner{width:36px;height:36px;border:3px solid #333;border-top-color:var(--primary);border-radius:50%;animation:spin .8s linear infinite}
-        .vl-text{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+        /* ===================== PLAYER ===================== */
+        .player-wrap{
+            position:relative;
+            width:100%;
+            background:#000;
+            border-radius:14px;
+            overflow:hidden;
+            margin-bottom:16px;
+            border:1px solid var(--border);
+            aspect-ratio:9/16;
+            cursor:pointer;
+            user-select:none;
+        }
+        .player-wrap video{
+            position:absolute;inset:0;
+            width:100%;height:100%;
+            object-fit:cover;display:block;
+        }
+
+        /* --- Thumbnail / loading overlay --- */
+        .player-thumb{
+            position:absolute;inset:0;
+            display:flex;flex-direction:column;
+            align-items:center;justify-content:center;
+            background:linear-gradient(160deg,#0d0d0d 0%,#1a0000 100%);
+            z-index:20;
+            transition:opacity .4s ease;
+        }
+        .player-thumb.hidden{opacity:0;pointer-events:none;}
+
+        .thumb-pulse{
+            position:relative;
+            width:80px;height:80px;
+            display:flex;align-items:center;justify-content:center;
+        }
+        .thumb-pulse::before,.thumb-pulse::after{
+            content:'';position:absolute;inset:0;
+            border-radius:50%;
+            background:rgba(239,68,68,.18);
+            animation:pulse-ring 2s cubic-bezier(.4,0,.6,1) infinite;
+        }
+        .thumb-pulse::after{animation-delay:.7s;}
+        @keyframes pulse-ring{
+            0%{transform:scale(.7);opacity:1}
+            100%{transform:scale(1.7);opacity:0}
+        }
+        .thumb-play-btn{
+            position:relative;z-index:2;
+            width:68px;height:68px;
+            background:var(--primary);
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:0 0 0 4px rgba(239,68,68,.35),0 8px 32px rgba(239,68,68,.5);
+            transition:transform .15s;
+        }
+        .player-wrap:active .thumb-play-btn{transform:scale(.93);}
+        .thumb-play-btn svg{width:28px;height:28px;fill:#fff;margin-left:5px;}
+
+        .thumb-label{
+            margin-top:18px;
+            font-size:clamp(12px,3.2vw,14px);
+            font-weight:900;
+            color:#fff;
+            text-transform:uppercase;
+            letter-spacing:1.5px;
+            text-shadow:0 2px 8px rgba(0,0,0,.8);
+        }
+        .thumb-sublabel{
+            margin-top:6px;
+            font-size:clamp(10px,2.5vw,12px);
+            font-weight:700;
+            color:rgba(255,255,255,.45);
+            text-transform:uppercase;
+            letter-spacing:.5px;
+        }
+
+        /* --- Centre pause/play flash --- */
+        .center-flash{
+            position:absolute;inset:0;
+            display:flex;align-items:center;justify-content:center;
+            z-index:15;pointer-events:none;
+            opacity:0;
+        }
+        .center-flash.show{animation:flash-anim .5s ease forwards;}
+        @keyframes flash-anim{
+            0%{opacity:1;transform:scale(.8)}
+            60%{opacity:1;transform:scale(1.1)}
+            100%{opacity:0;transform:scale(1.3)}
+        }
+        .cf-circle{
+            width:60px;height:60px;
+            background:rgba(0,0,0,.6);
+            border-radius:50%;
+            display:flex;align-items:center;justify-content:center;
+        }
+        .cf-circle svg{width:28px;height:28px;fill:#fff;}
+
+        /* --- Bottom controls bar --- */
+        .player-controls{
+            position:absolute;bottom:0;left:0;right:0;
+            background:linear-gradient(to top, rgba(0,0,0,.85) 0%, transparent 100%);
+            padding:28px 14px 10px;
+            z-index:30;
+            transition:opacity .3s;
+        }
+        .player-controls.hide{opacity:0;}
+
+        /* progress */
+        .prog-track{
+            width:100%;height:5px;
+            background:rgba(255,255,255,.25);
+            border-radius:10px;
+            position:relative;
+            cursor:pointer;
+            margin-bottom:10px;
+        }
+        .prog-track:hover{height:7px;margin-bottom:9px;}
+        .prog-buffered{
+            position:absolute;top:0;left:0;height:100%;
+            background:rgba(255,255,255,.35);
+            border-radius:10px;
+            width:0%;transition:width .5s linear;
+        }
+        .prog-played{
+            position:absolute;top:0;left:0;height:100%;
+            background:var(--primary);
+            border-radius:10px;
+            width:0%;
+            box-shadow:0 0 6px rgba(239,68,68,.7);
+        }
+        .prog-dot{
+            position:absolute;top:50%;right:-6px;
+            width:14px;height:14px;
+            background:#fff;border-radius:50%;
+            transform:translateY(-50%);
+            box-shadow:0 0 0 3px rgba(239,68,68,.5);
+            display:none;
+        }
+        .prog-track:hover .prog-dot{display:block;}
+
+        /* bottom row */
+        .ctrl-row{
+            display:flex;align-items:center;gap:10px;
+        }
+        .ctrl-btn{
+            background:none;border:none;cursor:pointer;
+            padding:4px;display:flex;align-items:center;justify-content:center;
+            flex-shrink:0;
+        }
+        .ctrl-btn svg{width:22px;height:22px;fill:#fff;display:block;}
+        .ctrl-time{
+            font-size:12px;font-weight:700;color:rgba(255,255,255,.85);
+            white-space:nowrap;flex-shrink:0;
+        }
+        .ctrl-spacer{flex:1;}
+        .ctrl-vol{display:flex;align-items:center;gap:6px;}
+        .vol-slider{
+            -webkit-appearance:none;appearance:none;
+            width:60px;height:4px;
+            border-radius:4px;
+            background:rgba(255,255,255,.3);
+            outline:none;cursor:pointer;
+        }
+        .vol-slider::-webkit-slider-thumb{
+            -webkit-appearance:none;
+            width:14px;height:14px;
+            border-radius:50%;
+            background:#fff;
+            cursor:pointer;
+            box-shadow:0 0 4px rgba(0,0,0,.5);
+        }
+
+        /* loading spinner over video */
+        .vid-spinner{
+            position:absolute;inset:0;
+            display:none;align-items:center;justify-content:center;
+            z-index:18;
+            pointer-events:none;
+        }
+        .vid-spinner.show{display:flex;}
+        .vs-ring{
+            width:42px;height:42px;
+            border:3px solid rgba(255,255,255,.15);
+            border-top-color:var(--primary);
+            border-radius:50%;
+            animation:spin .8s linear infinite;
+        }
         @keyframes spin{to{transform:rotate(360deg)}}
 
         .secure-footer{font-size:clamp(10px,2.5vw,11px);color:var(--muted);margin-top:14px;line-height:1.5}
@@ -97,29 +269,82 @@
 <body>
 <div class="quiz-card">
 
-    <!-- TELA 1: VÍDEO AUTOPLAY -->
+    <!-- TELA 1: PLAYER -->
     <div id="s-0" class="screen active">
         <div class="fixed-header">PROTOCOLO BICARBONATO — MÉTODO CIENTÍFICO</div>
         <h1 class="headline">AUMENTE SEU PÊNIS ATÉ 7CM EM 45 DIAS SEM CIRURGIA OU APARELHOS</h1>
         <p class="sub-headline">Assista ao vídeo e descubra o método usado por milhares de homens</p>
 
-        <div class="video-wrap">
-            <div class="video-loading" id="video-loading">
-                <div class="vl-spinner"></div>
-                <div class="vl-text">Carregando vídeo...</div>
+        <div class="player-wrap" id="player-wrap" onclick="handlePlayerClick()">
+
+            <!-- Thumbnail / estado inicial -->
+            <div class="player-thumb" id="player-thumb">
+                <div class="thumb-pulse">
+                    <div class="thumb-play-btn">
+                        <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
+                    </div>
+                </div>
+                <div class="thumb-label">Clique para assistir o vídeo</div>
+                <div class="thumb-sublabel">▶ Reproduzir agora</div>
             </div>
-            <video id="main-video" playsinline webkit-playsinline preload="auto">
+
+            <!-- Flash centro (play/pause) -->
+            <div class="center-flash" id="center-flash">
+                <div class="cf-circle" id="cf-circle">
+                    <svg viewBox="0 0 24 24" id="cf-icon"><polygon points="5,3 19,12 5,21"/></svg>
+                </div>
+            </div>
+
+            <!-- Spinner de carregamento -->
+            <div class="vid-spinner" id="vid-spinner">
+                <div class="vs-ring"></div>
+            </div>
+
+            <!-- Vídeo -->
+            <video id="main-video" playsinline webkit-playsinline preload="metadata">
                 <source src="https://doram.shop/wp-content/uploads/2026/03/0322-1.mp4" type="video/mp4">
             </video>
-            <div class="video-progress-bar">
-                <div class="video-progress-fill" id="video-progress"></div>
+
+            <!-- Controles bottom -->
+            <div class="player-controls" id="player-controls">
+                <!-- Barra de progresso -->
+                <div class="prog-track" id="prog-track" onclick="seekVideo(event)" onmousemove="seekPreview(event)">
+                    <div class="prog-buffered" id="prog-buffered"></div>
+                    <div class="prog-played" id="prog-played">
+                        <div class="prog-dot"></div>
+                    </div>
+                </div>
+                <!-- Linha de controles -->
+                <div class="ctrl-row">
+                    <button class="ctrl-btn" onclick="togglePlay(event)" id="play-pause-btn" aria-label="Play/Pause">
+                        <svg viewBox="0 0 24 24" id="pp-icon"><polygon points="5,3 19,12 5,21"/></svg>
+                    </button>
+                    <span class="ctrl-time" id="ctrl-time">0:00 / 0:00</span>
+                    <div class="ctrl-spacer"></div>
+                    <div class="ctrl-vol">
+                        <button class="ctrl-btn" onclick="toggleMute(event)" id="mute-btn" aria-label="Mute">
+                            <svg viewBox="0 0 24 24" id="vol-icon">
+                                <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="#fff"/>
+                                <path d="M15.54 8.46a5 5 0 010 7.07" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                <path d="M19.07 4.93a10 10 0 010 14.14" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                            </svg>
+                        </button>
+                        <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)" onclick="stopProp(event)">
+                    </div>
+                    <button class="ctrl-btn" onclick="toggleFullscreen(event)" aria-label="Fullscreen">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
+                            <polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/>
+                            <line x1="21" y1="3" x2="14" y2="10"/><line x1="3" y1="21" x2="10" y2="14"/>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
         <button class="btn-next" onclick="goNext()">🔓 LIBERAR MINHA FÓRMULA AGORA</button>
     </div>
 
-    <!-- TELA 2: AUTORIDADE -->
+    <!-- TELA 2 -->
     <div id="s-1" class="screen">
         <div class="fixed-header">AVALIAÇÃO PERSONALIZADA GRATUITA</div>
         <h2 class="headline">DESCUBRA QUANTO VOCÊ PODE CRESCER EM 45 DIAS</h2>
@@ -132,13 +357,14 @@
         <button class="btn-next" onclick="next()">INICIAR MINHA AVALIAÇÃO GRATUITA</button>
     </div>
 
-    <!-- TELA 3-5: Quiz, Processamento, Oferta -->
+    <!-- TELA 3 -->
     <div id="s-2" class="screen">
         <div class="fixed-header">AVALIAÇÃO CLÍNICA — ETAPA <span id="q-num">1</span>/5</div>
         <div class="progress-bar"><div class="progress-fill" id="p-fill"></div></div>
         <div id="q-box"></div>
     </div>
 
+    <!-- TELA 4 -->
     <div id="s-3" class="screen">
         <div class="fixed-header">SISTEMA DE DIAGNÓSTICO AVANÇADO</div>
         <h2 style="font-size:clamp(16px,4.5vw,20px);font-weight:900;margin-bottom:18px">ANALISANDO SEUS DADOS BIOMÉTRICOS</h2>
@@ -152,6 +378,7 @@
         </div>
     </div>
 
+    <!-- TELA 5 -->
     <div id="s-4" class="screen">
         <div class="fixed-header">✓ AVALIAÇÃO CONCLUÍDA</div>
         <h2 style="font-size:clamp(17px,4.8vw,20px);font-weight:900;margin-bottom:18px">SEU PLANO PERSONALIZADO DE 45 DIAS ESTÁ PRONTO</h2>
@@ -175,27 +402,158 @@
 
 <script>
 const CHECKOUT='https://pay.wiapy.com/LJuEuullf4';
-const vid=document.getElementById('main-video');
-const loadingEl=document.getElementById('video-loading');
-const progressBar=document.getElementById('video-progress');
 
-// AUTOPLAY APÓS 1 SEGUNDO
-setTimeout(function(){
-    loadingEl.classList.add('hidden');
-    vid.play().catch(function(e){console.log('Autoplay:',e)});
-},1000);
+/* ========== PLAYER ========== */
+var vid          = document.getElementById('main-video');
+var thumb        = document.getElementById('player-thumb');
+var controls     = document.getElementById('player-controls');
+var progPlayed   = document.getElementById('prog-played');
+var progBuffered = document.getElementById('prog-buffered');
+var progTrack    = document.getElementById('prog-track');
+var ctrlTime     = document.getElementById('ctrl-time');
+var ppIcon       = document.getElementById('pp-icon');
+var volIcon      = document.getElementById('vol-icon');
+var volSlider    = document.getElementById('vol-slider');
+var vidSpinner   = document.getElementById('vid-spinner');
+var centerFlash  = document.getElementById('center-flash');
+var cfIcon       = document.getElementById('cf-icon');
 
-// BARRA DE PROGRESSO
-vid.addEventListener('timeupdate',function(){
-    if(vid.duration>0){
-        progressBar.style.width=((vid.currentTime/vid.duration)*100)+'%';
+var isPlaying    = false;
+var hideTimer    = null;
+var started      = false;
+
+/* Play/Pause icons */
+var ICON_PLAY  = '<polygon points="5,3 19,12 5,21"/>';
+var ICON_PAUSE = '<rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/>';
+var ICON_VOL   = '<polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="#fff"/><path d="M15.54 8.46a5 5 0 010 7.07" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/><path d="M19.07 4.93a10 10 0 010 14.14" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>';
+var ICON_MUTE  = '<polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="#fff"/><line x1="23" y1="9" x2="17" y2="15" stroke="#fff" stroke-width="2" stroke-linecap="round"/><line x1="17" y1="9" x2="23" y2="15" stroke="#fff" stroke-width="2" stroke-linecap="round"/>';
+
+function fmt(s){
+    s=Math.floor(s||0);
+    return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;
+}
+
+function setPPIcon(playing){
+    ppIcon.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+}
+
+function flashCenter(playing){
+    cfIcon.innerHTML = playing ? ICON_PAUSE : ICON_PLAY;
+    centerFlash.classList.remove('show');
+    void centerFlash.offsetWidth;
+    centerFlash.classList.add('show');
+}
+
+function showControls(){
+    controls.classList.remove('hide');
+    clearTimeout(hideTimer);
+    if(isPlaying) hideTimer = setTimeout(function(){ controls.classList.add('hide'); }, 3000);
+}
+
+/* Primeiro clique: iniciar vídeo */
+function handlePlayerClick(){
+    if(!started){
+        started = true;
+        thumb.classList.add('hidden');
+        vidSpinner.classList.add('show');
+        vid.play().then(function(){
+            vidSpinner.classList.remove('show');
+            isPlaying = true;
+            setPPIcon(true);
+            showControls();
+        }).catch(function(){
+            vidSpinner.classList.remove('show');
+            thumb.classList.remove('hidden');
+            started = false;
+        });
+    } else {
+        togglePlay(null);
+    }
+}
+
+function togglePlay(e){
+    if(e){ e.stopPropagation(); }
+    if(vid.paused){
+        vid.play();
+        isPlaying = true;
+        setPPIcon(true);
+        flashCenter(true);
+    } else {
+        vid.pause();
+        isPlaying = false;
+        setPPIcon(false);
+        flashCenter(false);
+    }
+    showControls();
+}
+
+function toggleMute(e){
+    if(e) e.stopPropagation();
+    vid.muted = !vid.muted;
+    volIcon.innerHTML = vid.muted ? ICON_MUTE : ICON_VOL;
+    volSlider.value   = vid.muted ? 0 : vid.volume;
+}
+
+function setVolume(v){
+    vid.volume = v;
+    vid.muted  = (v == 0);
+    volIcon.innerHTML = (v == 0) ? ICON_MUTE : ICON_VOL;
+}
+
+function seekVideo(e){
+    e.stopPropagation();
+    if(!vid.duration) return;
+    var rect = progTrack.getBoundingClientRect();
+    var pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
+    vid.currentTime = pct * vid.duration;
+    showControls();
+}
+
+function seekPreview(e){ /* hover highlight handled by CSS */ }
+
+function stopProp(e){ e.stopPropagation(); }
+
+function toggleFullscreen(e){
+    if(e) e.stopPropagation();
+    var el = document.getElementById('player-wrap');
+    if(document.fullscreenElement){
+        document.exitFullscreen && document.exitFullscreen();
+    } else {
+        el.requestFullscreen ? el.requestFullscreen() :
+        el.webkitRequestFullscreen ? el.webkitRequestFullscreen() : null;
+    }
+}
+
+/* Progress update */
+vid.addEventListener('timeupdate', function(){
+    if(!vid.duration) return;
+    var pct = (vid.currentTime / vid.duration) * 100;
+    progPlayed.style.width = pct + '%';
+    ctrlTime.textContent = fmt(vid.currentTime) + ' / ' + fmt(vid.duration);
+});
+
+/* Buffered */
+vid.addEventListener('progress', function(){
+    if(vid.buffered.length && vid.duration){
+        var b = (vid.buffered.end(vid.buffered.length-1) / vid.duration) * 100;
+        progBuffered.style.width = b + '%';
     }
 });
 
-function stopVideo(){try{vid.pause();vid.currentTime=0}catch(e){}}
-function goNext(){stopVideo();next()}
+/* Waiting / playing */
+vid.addEventListener('waiting',  function(){ vidSpinner.classList.add('show'); });
+vid.addEventListener('playing',  function(){ vidSpinner.classList.remove('show'); isPlaying=true; setPPIcon(true); });
+vid.addEventListener('pause',    function(){ isPlaying=false; setPPIcon(false); showControls(); });
+vid.addEventListener('ended',    function(){ isPlaying=false; setPPIcon(false); showControls(); });
 
-/* QUIZ */
+/* Show controls on touch/mouse move over player */
+document.getElementById('player-wrap').addEventListener('mousemove', showControls);
+document.getElementById('player-wrap').addEventListener('touchstart', showControls, {passive:true});
+
+function stopVideo(){ try{ vid.pause(); vid.currentTime=0; }catch(e){} }
+function goNext(){ stopVideo(); next(); }
+
+/* ========== QUIZ ========== */
 const ICONS={sad:'<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 15s1.5-2 4-2 4 2 4 2"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',warning:'<svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>',neutral:'<svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="8" y1="15" x2="16" y2="15"/><line x1="9" y1="9" x2="9.01" y2="9"/><line x1="15" y1="9" x2="15.01" y2="9"/></svg>',ok:'<svg viewBox="0 0 24 24" fill="none" stroke="#22c55e" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>',fire:'<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><path d="M12 2c0 6-8 8-8 14a8 8 0 0016 0c0-4-2-7-4-9-1 3-4 4-4 4z"/></svg>',clock:'<svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>',search:'<svg viewBox="0 0 24 24" fill="none" stroke="#9ca3af" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>',target:'<svg viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>'};
 const QUESTIONS=[{id:'rigidez',t:'Com que frequência você consegue atingir rigidez TOTAL durante uma relação sexual?',sub:'Esse dado revela seu nível de vascularização peniana',o:[{icon:'sad',text:'Quase nunca — fico mole antes de terminar'},{icon:'warning',text:'Raramente — acontece mas é instável'},{icon:'neutral',text:'Às vezes — depende do dia'},{icon:'ok',text:'Frequentemente — só falha ocasionalmente'},{icon:'fire',text:'Sempre — sem nenhuma dificuldade'}]},{id:'matinal',t:'Você ainda acorda com ereção matinal (o "sinal de testosterona")?',sub:'Indicador clínico direto dos seus níveis hormonais',o:[{icon:'sad',text:'Nunca — faz muito tempo que não acontece'},{icon:'warning',text:'Raramente — 1 vez por semana ou menos'},{icon:'ok',text:'Quase todos os dias — meu corpo ainda responde bem'}]},{id:'manutencao',t:'Você consegue manter a ereção firme do início ao FIM da relação?',sub:'Esse fator define a eficácia do protocolo para você',o:[{icon:'sad',text:'Não — perco antes de terminar com frequência'},{icon:'warning',text:'Às vezes — falha na hora mais crítica'},{icon:'ok',text:'Sim — sem problemas para manter até o fim'}]},{id:'libido',t:'Como está seu desejo sexual nos últimos 3 meses?',sub:'O libido revela o estado atual da sua testosterona livre',o:[{icon:'sad',text:'Muito baixo — raramente sinto vontade'},{icon:'warning',text:'Baixo — preciso de muito estímulo'},{icon:'neutral',text:'Normal — nada me preocupa muito'},{icon:'fire',text:'Alto — só quero resultados físicos melhores'}]},{id:'prioridade',t:'Ser maior e ter mais controle nas relações é uma prioridade REAL para você agora?',sub:'Sua resposta define o plano ideal para o seu perfil',o:[{icon:'target',text:'SIM — quero resolver isso o quanto antes'},{icon:'clock',text:'Sim — mas posso esperar um pouco'},{icon:'search',text:'Estou apenas pesquisando por agora'}]}];
 let step=0,qIdx=0;const totalQ=QUESTIONS.length;
