@@ -277,8 +277,8 @@
 
         <div class="player-wrap" id="player-wrap" onclick="handlePlayerClick()">
 
-            <!-- Thumbnail / estado inicial -->
-            <div class="player-thumb" id="player-thumb">
+            <!-- Thumbnail / estado inicial — começa oculta -->
+            <div class="player-thumb hidden" id="player-thumb">
                 <div class="thumb-pulse">
                     <div class="thumb-play-btn">
                         <svg viewBox="0 0 24 24"><polygon points="5,3 19,12 5,21"/></svg>
@@ -301,7 +301,7 @@
             </div>
 
             <!-- Vídeo -->
-            <video id="main-video" playsinline webkit-playsinline preload="metadata">
+            <video id="main-video" playsinline webkit-playsinline preload="auto" autoplay muted>
                 <source src="https://doram.shop/wp-content/uploads/2026/03/0322-1.mp4" type="video/mp4">
             </video>
 
@@ -317,7 +317,7 @@
                 <!-- Linha de controles -->
                 <div class="ctrl-row">
                     <button class="ctrl-btn" onclick="togglePlay(event)" id="play-pause-btn" aria-label="Play/Pause">
-                        <svg viewBox="0 0 24 24" id="pp-icon"><polygon points="5,3 19,12 5,21"/></svg>
+                        <svg viewBox="0 0 24 24" id="pp-icon"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                     </button>
                     <span class="ctrl-time" id="ctrl-time">0:00 / 0:00</span>
                     <div class="ctrl-spacer"></div>
@@ -325,11 +325,11 @@
                         <button class="ctrl-btn" onclick="toggleMute(event)" id="mute-btn" aria-label="Mute">
                             <svg viewBox="0 0 24 24" id="vol-icon">
                                 <polygon points="11,5 6,9 2,9 2,15 6,15 11,19" fill="#fff"/>
-                                <path d="M15.54 8.46a5 5 0 010 7.07" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
-                                <path d="M19.07 4.93a10 10 0 010 14.14" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                                <line x1="23" y1="9" x2="17" y2="15" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+                                <line x1="17" y1="9" x2="23" y2="15" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
                             </svg>
                         </button>
-                        <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.05" value="1" oninput="setVolume(this.value)" onclick="stopProp(event)">
+                        <input type="range" class="vol-slider" id="vol-slider" min="0" max="1" step="0.05" value="0" oninput="setVolume(this.value)" onclick="stopProp(event)">
                     </div>
                     <button class="ctrl-btn" onclick="toggleFullscreen(event)" aria-label="Fullscreen">
                         <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round">
@@ -418,9 +418,9 @@ var vidSpinner   = document.getElementById('vid-spinner');
 var centerFlash  = document.getElementById('center-flash');
 var cfIcon       = document.getElementById('cf-icon');
 
-var isPlaying    = false;
+var isPlaying    = true; // começa tocando (autoplay muted)
 var hideTimer    = null;
-var started      = false;
+var started      = true; // já iniciou automaticamente
 
 /* Play/Pause icons */
 var ICON_PLAY  = '<polygon points="5,3 19,12 5,21"/>';
@@ -450,7 +450,7 @@ function showControls(){
     if(isPlaying) hideTimer = setTimeout(function(){ controls.classList.add('hide'); }, 3000);
 }
 
-/* Primeiro clique: iniciar vídeo */
+/* Clique no player: se já iniciado, toggle play/pause */
 function handlePlayerClick(){
     if(!started){
         started = true;
@@ -490,8 +490,14 @@ function togglePlay(e){
 function toggleMute(e){
     if(e) e.stopPropagation();
     vid.muted = !vid.muted;
-    volIcon.innerHTML = vid.muted ? ICON_MUTE : ICON_VOL;
-    volSlider.value   = vid.muted ? 0 : vid.volume;
+    if(vid.muted){
+        volIcon.innerHTML = ICON_MUTE;
+        volSlider.value = 0;
+    } else {
+        volIcon.innerHTML = ICON_VOL;
+        vid.volume = 1;
+        volSlider.value = 1;
+    }
 }
 
 function setVolume(v){
@@ -542,13 +548,24 @@ vid.addEventListener('progress', function(){
 
 /* Waiting / playing */
 vid.addEventListener('waiting',  function(){ vidSpinner.classList.add('show'); });
-vid.addEventListener('playing',  function(){ vidSpinner.classList.remove('show'); isPlaying=true; setPPIcon(true); });
+vid.addEventListener('playing',  function(){ vidSpinner.classList.remove('show'); isPlaying=true; setPPIcon(true); showControls(); });
 vid.addEventListener('pause',    function(){ isPlaying=false; setPPIcon(false); showControls(); });
 vid.addEventListener('ended',    function(){ isPlaying=false; setPPIcon(false); showControls(); });
+
+/* Quando o usuário clica para ativar som, atualiza o ícone e slider */
+vid.addEventListener('volumechange', function(){
+    if(!vid.muted && vid.volume > 0){
+        volIcon.innerHTML = ICON_VOL;
+        volSlider.value = vid.volume;
+    }
+});
 
 /* Show controls on touch/mouse move over player */
 document.getElementById('player-wrap').addEventListener('mousemove', showControls);
 document.getElementById('player-wrap').addEventListener('touchstart', showControls, {passive:true});
+
+/* Auto-esconde controles após 3s no início */
+hideTimer = setTimeout(function(){ controls.classList.add('hide'); }, 3000);
 
 function stopVideo(){ try{ vid.pause(); vid.currentTime=0; }catch(e){} }
 function goNext(){ stopVideo(); next(); }
